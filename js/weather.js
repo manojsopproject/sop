@@ -3,7 +3,7 @@
    OpenWeatherMap integration + farming advisory
    ============================================================ */
 
-const OWM_KEY = '4ec17c3a4f2c45660392276c2b20d69f' ; // demo public key — replace with your own
+const OWM_KEY = '73a8a92da6804ea5f0d84a9e45fba279' ; // demo public key — replace with your own
 
 const FARMING_TIPS = {
   Clear:       { en: 'Great day for field work and spraying.', hi: 'खेत का काम और छिड़काव के लिए अच्छा दिन।' },
