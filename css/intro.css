@@ -1,0 +1,330 @@
+/* ============================================================
+   KisanMitra — Intro Video Overlay
+   Earthy Premium theme: warm greens, harvest gold
+   ============================================================ */
+
+/* ── Scroll lock — applied to <html> while intro is active ─ */
+/* Using <html> is cleaner than body inline styles on desktop  */
+html.intro-active,
+html.intro-active body {
+  overflow: hidden !important;
+  /* Do NOT set height here — that's what broke the laptop layout */
+}
+
+/* ── Intro Overlay ─────────────────────────────────────────── */
+#intro-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  /* right/bottom:0 is MORE reliable than 100vw/100vh on all browsers.
+     The browser always stretches fixed elements to the viewport edges. */
+  z-index: 99999;
+  background: #0a2614;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+
+  opacity: 1;
+  transition: opacity 0.9s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#intro-overlay.fade-out {
+  opacity: 0;
+  pointer-events: none;
+}
+
+#intro-overlay.hidden {
+  display: none !important;
+}
+
+/* ── Fullscreen Video ──────────────────────────────────────── */
+/*
+ * position:absolute with all four sides = 0 makes the video
+ * exactly fill the overlay regardless of the video's own
+ * aspect ratio vs the viewport's aspect ratio.
+ *
+ * object-fit: cover = zoom/crop to fill — no black bars ever.
+ *
+ * Works on: portrait phones, landscape phones,
+ *           tablets, laptops (16:9/16:10), 4K, ultrawide.
+ */
+#intro-video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
+  display: block;
+
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+
+#intro-video.visible {
+  opacity: 1;
+}
+
+/* ── Dark gradient vignette over video ─────────────────────── */
+#intro-overlay::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at center, transparent 40%, rgba(10, 38, 20, 0.55) 100%),
+    linear-gradient(to bottom,
+      rgba(10, 38, 20, 0.35) 0%,
+      transparent 20%,
+      transparent 70%,
+      rgba(10, 38, 20, 0.6) 100%
+    );
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* ── Brand Bug (top-left logo) ─────────────────────────────── */
+#intro-brand {
+  position: absolute;
+  top: 28px;
+  left: 32px;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: opacity 0.7s ease 0.5s, transform 0.7s ease 0.5s;
+}
+
+#intro-brand.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+#intro-brand .brand-icon {
+  font-size: 2rem;
+  line-height: 1;
+  filter: drop-shadow(0 2px 8px rgba(0,0,0,0.4));
+}
+
+#intro-brand .brand-name {
+  font-family: 'Rajdhani', 'Hind', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: 0.03em;
+  text-shadow: 0 2px 12px rgba(0,0,0,0.5);
+}
+
+#intro-brand .brand-tagline {
+  font-family: 'Hind', sans-serif;
+  font-size: 0.7rem;
+  color: rgba(240, 165, 0, 0.9);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  line-height: 1;
+  margin-top: 1px;
+  text-shadow: 0 1px 6px rgba(0,0,0,0.5);
+}
+
+/* ── Loading Spinner ───────────────────────────────────────── */
+#intro-spinner {
+  position: absolute;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  opacity: 1;
+  transition: opacity 0.4s ease;
+}
+
+#intro-spinner.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.spinner-ring {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: 3px solid rgba(240, 165, 0, 0.15);
+  border-top-color: #f0a500;
+  border-right-color: rgba(240, 165, 0, 0.5);
+  animation: spin 1s cubic-bezier(0.6, 0.2, 0.4, 0.9) infinite;
+  filter: drop-shadow(0 0 10px rgba(240, 165, 0, 0.4));
+}
+
+.spinner-inner {
+  position: absolute;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 2px solid rgba(52, 196, 104, 0.15);
+  border-bottom-color: #34c468;
+  animation: spin-rev 0.7s linear infinite;
+  top: 10px;
+  left: 10px;
+}
+
+.spinner-wrap {
+  position: relative;
+  width: 56px;
+  height: 56px;
+}
+
+.spinner-icon {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  animation: pulse-icon 2s ease-in-out infinite;
+}
+
+.spinner-text {
+  font-family: 'Hind', sans-serif;
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 0.8rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+@keyframes spin     { to { transform: rotate(360deg); } }
+@keyframes spin-rev { to { transform: rotate(-360deg); } }
+@keyframes pulse-icon {
+  0%, 100% { transform: scale(1); opacity: 0.9; }
+  50%       { transform: scale(1.15); opacity: 1; }
+}
+
+/* ── Progress Bar ──────────────────────────────────────────── */
+#intro-progress-wrap {
+  position: absolute;
+  bottom: 90px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(320px, 70vw);
+  z-index: 10;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+#intro-progress-wrap.show { opacity: 1; }
+
+.progress-track {
+  width: 100%;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+#intro-progress-bar {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #34c468, #f0a500);
+  border-radius: 2px;
+  transition: width 0.25s linear;
+  box-shadow: 0 0 8px rgba(240, 165, 0, 0.5);
+}
+
+/* ── Skip Button ───────────────────────────────────────────── */
+#intro-skip-btn {
+  position: absolute;
+  bottom: 36px;
+  right: 32px;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 10px 20px;
+  border: 1.5px solid rgba(255, 255, 255, 0.3);
+  border-radius: 100px;
+  background: rgba(10, 38, 20, 0.55);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  font-family: 'Hind', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.85);
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  outline: none;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.5s ease 1s, transform 0.5s ease 1s,
+              background 0.25s ease, border-color 0.25s ease, color 0.25s ease;
+}
+
+#intro-skip-btn.show          { opacity: 1; transform: translateY(0); }
+#intro-skip-btn:hover         { background: rgba(240,165,0,0.2); border-color: rgba(240,165,0,0.7); color: #f0a500; }
+#intro-skip-btn:active        { transform: scale(0.97); }
+#intro-skip-btn .skip-arrow   { font-size: 0.75rem; transition: transform 0.25s ease; }
+#intro-skip-btn:hover .skip-arrow { transform: translateX(4px); }
+
+/* ── Mute Toggle ───────────────────────────────────────────── */
+#intro-mute-btn {
+  position: absolute;
+  bottom: 36px;
+  left: 32px;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255, 255, 255, 0.25);
+  background: rgba(10, 38, 20, 0.5);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.75);
+  cursor: pointer;
+  outline: none;
+  opacity: 0;
+  transition: opacity 0.5s ease 1s, background 0.2s ease,
+              border-color 0.2s ease, color 0.2s ease;
+}
+
+#intro-mute-btn.show  { opacity: 1; }
+#intro-mute-btn:hover { background: rgba(52,196,104,0.2); border-color: rgba(52,196,104,0.6); color: #34c468; }
+
+/* ── Mobile portrait ───────────────────────────────────────── */
+@media (max-width: 600px) {
+  #intro-brand          { top: 20px; left: 20px; }
+  #intro-brand .brand-name { font-size: 1.25rem; }
+  #intro-skip-btn       { bottom: 24px; right: 16px; padding: 9px 16px; font-size: 0.78rem; }
+  #intro-mute-btn       { bottom: 24px; left: 16px; }
+  #intro-progress-wrap  { bottom: 74px; width: 75vw; }
+}
+
+/* ── Landscape phones (very short viewport) ─────────────────── */
+@media (max-height: 500px) and (orientation: landscape) {
+  #intro-video          { object-position: center 30%; }
+  #intro-brand          { top: 10px; left: 14px; }
+  #intro-skip-btn       { bottom: 10px; right: 14px; padding: 7px 14px; }
+  #intro-mute-btn       { bottom: 10px; left: 14px; width: 34px; height: 34px; }
+  #intro-progress-wrap  { bottom: 52px; }
+}
+
+/* ── Reduced motion: no animation, dismiss instantly ───────── */
+@media (prefers-reduced-motion: reduce) {
+  #intro-overlay,
+  #intro-video,
+  #intro-brand,
+  #intro-skip-btn,
+  #intro-mute-btn,
+  #intro-progress-wrap,
+  #intro-spinner {
+    transition: none !important;
+    animation: none !important;
+  }
+}

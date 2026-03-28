@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KisanMitra — My Profile</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    .page-content { max-width:900px; margin:0 auto; padding:1.5rem; }
+    .profile-hero { background:linear-gradient(135deg,var(--green-800),var(--green-600)); color:#fff; padding:2.5rem 1.5rem 4rem; border-radius:var(--radius-lg); margin-bottom:1rem; position:relative; }
+    .profile-avatar-wrap { position:absolute; bottom:-44px; left:50%; transform:translateX(-50%); }
+    .profile-avatar { width:88px; height:88px; background:linear-gradient(135deg,var(--green-500),var(--green-400)); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:2.4rem; color:white; font-family:'Rajdhani',sans-serif; font-weight:700; border:4px solid var(--gold); box-shadow:0 4px 20px rgba(240,165,0,0.4); }
+
+    .profile-card { background:var(--white); border-radius:var(--radius-md); box-shadow:var(--shadow-sm); border:1px solid var(--cream-200); overflow:hidden; margin-bottom:1.25rem; }
+    .profile-card-header { padding:1rem 1.4rem; background:var(--green-50); border-bottom:1px solid var(--cream-200); display:flex; align-items:center; gap:10px; }
+    .profile-card-header h3 { font-size:1rem; color:var(--green-800); margin:0; }
+    .profile-card-header i { color:var(--green-600); }
+    .profile-card-body { padding:1.25rem 1.4rem; }
+
+    .info-row { display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid var(--cream-100); font-size:0.88rem; }
+    .info-row:last-child { border-bottom:none; }
+    .info-row .label { color:var(--text-500); font-weight:600; font-size:0.75rem; text-transform:uppercase; letter-spacing:0.05em; display:flex; align-items:center; gap:6px; }
+    .info-row .value { color:var(--text-900); font-weight:500; text-align:right; }
+    .info-row .value.editable { cursor:pointer; }
+    .info-row .value.editable:hover { color:var(--green-600); }
+
+    /* Edit form */
+    .edit-section { display:none; }
+    .edit-section.show { display:block; }
+    .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+    @media(max-width:600px){ .form-grid{grid-template-columns:1fr;} }
+
+    /* Stats strip */
+    .profile-stats { display:grid; grid-template-columns:repeat(3,1fr); gap:1rem; margin-bottom:1.25rem; }
+    .profile-stat { background:var(--white); border-radius:var(--radius-md); padding:1.25rem; text-align:center; box-shadow:var(--shadow-sm); border:1px solid var(--cream-200); }
+    .profile-stat .ps-value { font-family:'Rajdhani',sans-serif; font-size:1.6rem; font-weight:700; color:var(--green-800); }
+    .profile-stat .ps-label { font-size:0.75rem; color:var(--text-500); text-transform:uppercase; letter-spacing:0.05em; margin-top:4px; }
+    @media(max-width:500px){ .profile-stats{grid-template-columns:1fr;} }
+
+    .name-center { text-align:center; padding-top:3.5rem; padding-bottom:1.5rem; }
+    .name-center h2 { font-size:1.6rem; color:var(--green-800); margin-bottom:4px; }
+    .name-center p { color:var(--text-500); font-size:0.88rem; }
+
+    .btn-logout-big { background:var(--terra-100); color:var(--terra-500); border:1.5px solid var(--terra-100); padding:10px 20px; border-radius:var(--radius-sm); font-family:'Rajdhani',sans-serif; font-weight:700; font-size:0.95rem; cursor:pointer; display:inline-flex; align-items:center; gap:8px; transition:all var(--transition); }
+    .btn-logout-big:hover { background:var(--terra-500); color:white; border-color:var(--terra-500); }
+
+    .nav-avatar { color:rgba(255,255,255,0.7); font-size:1.4rem; transition:color var(--transition); }
+    .nav-avatar:hover { color:var(--gold); }
+    .btn-logout { background:none; border:none; color:rgba(255,255,255,0.7); font-size:1.1rem; padding:6px; transition:color var(--transition); cursor:pointer; }
+    .btn-logout:hover { color:var(--terra-500); }
+  </style>
+</head>
+<body>
+  <div id="toastContainer" class="toast-container"></div>
+
+  <nav class="navbar">
+    <a href="dashboard.html" class="navbar-brand">
+      <div class="navbar-logo">🌾</div>
+      <div class="navbar-brand-text">
+        <span class="brand-main">KisanMitra</span>
+        <span class="brand-sub">Smart Farming</span>
+      </div>
+    </a>
+    <ul class="navbar-nav-links">
+      <li><a href="dashboard.html"><i class="fas fa-home"></i> <span data-i18n="nav.dashboard">Dashboard</span></a></li>
+      <li><a href="crops.html"><i class="fas fa-seedling"></i> <span data-i18n="nav.crops">Crop Advisor</span></a></li>
+      <li><a href="prices.html"><i class="fas fa-chart-bar"></i> <span data-i18n="nav.prices">Market Prices</span></a></li>
+      <li><a href="pest.html"><i class="fas fa-bug"></i> <span data-i18n="nav.pest">Pest Check</span></a></li>
+      <li><a href="schemes.html"><i class="fas fa-scroll"></i> <span data-i18n="nav.schemes">Schemes</span></a></li>
+    </ul>
+    <div class="navbar-actions">
+      <button class="lang-btn" id="langBtn" onclick="toggleLang()">हिंदी</button>
+      <button class="voice-btn" onclick="toggleVoice()" title="Voice Command"><i class="fas fa-microphone"></i></button>
+      <a href="profile.html" class="nav-avatar"><i class="fas fa-user-circle"></i></a>
+      <button onclick="logout()" class="btn-logout"><i class="fas fa-sign-out-alt"></i></button>
+    </div>
+  </nav>
+
+  <main class="page-content">
+    <!-- Hero with avatar -->
+    <div class="profile-hero">
+      <h1 style="color:#fff;font-size:1.8rem;text-align:center;" data-i18n="profile.title">My Profile</h1>
+      <p style="text-align:center;opacity:0.7;font-size:0.88rem;margin-top:4px;">Manage your farm profile & preferences</p>
+      <div class="profile-avatar-wrap">
+        <div class="profile-avatar" id="avatarInitial">R</div>
+      </div>
+    </div>
+
+    <!-- Name / role -->
+    <div class="name-center">
+      <h2 id="profileName">Farmer</h2>
+      <p id="profileSub">@username · Maharashtra</p>
+    </div>
+
+    <!-- Stats strip -->
+    <div class="profile-stats">
+      <div class="profile-stat">
+        <div class="ps-value" id="psMemberDays">—</div>
+        <div class="ps-label">Days Active</div>
+      </div>
+      <div class="profile-stat">
+        <div class="ps-value" id="psLand">—</div>
+        <div class="ps-label">Land Holding</div>
+      </div>
+      <div class="profile-stat">
+        <div class="ps-value" id="psCrop">—</div>
+        <div class="ps-label">Primary Crop</div>
+      </div>
+    </div>
+
+    <!-- Profile Info card -->
+    <div class="profile-card">
+      <div class="profile-card-header">
+        <i class="fas fa-user"></i>
+        <h3>Personal Information</h3>
+        <button class="btn-outline-green" style="margin-left:auto;padding:5px 14px;font-size:0.82rem;" onclick="toggleEdit()">
+          <i class="fas fa-edit"></i> Edit
+        </button>
+      </div>
+      <div class="profile-card-body">
+        <!-- View mode -->
+        <div id="viewMode">
+          <div class="info-row">
+            <span class="label"><i class="fas fa-user"></i> Full Name</span>
+            <span class="value" id="dispName">—</span>
+          </div>
+          <div class="info-row">
+            <span class="label"><i class="fas fa-at"></i> Username</span>
+            <span class="value" id="dispUsername">—</span>
+          </div>
+          <div class="info-row">
+            <span class="label"><i class="fas fa-phone"></i> Phone</span>
+            <span class="value" id="dispPhone">—</span>
+          </div>
+          <div class="info-row">
+            <span class="label"><i class="fas fa-map-marker-alt"></i> State</span>
+            <span class="value" id="dispState">—</span>
+          </div>
+          <div class="info-row">
+            <span class="label"><i class="fas fa-calendar"></i> Member Since</span>
+            <span class="value" id="dispMember">—</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Farm Details card -->
+    <div class="profile-card">
+      <div class="profile-card-header">
+        <i class="fas fa-tractor"></i>
+        <h3>Farm Details</h3>
+      </div>
+      <div class="profile-card-body">
+        <div id="viewFarm">
+          <div class="info-row">
+            <span class="label"><i class="fas fa-mountain"></i> Soil Type</span>
+            <span class="value" id="dispSoil">—</span>
+          </div>
+          <div class="info-row">
+            <span class="label"><i class="fas fa-seedling"></i> Primary Crop</span>
+            <span class="value" id="dispCrop">—</span>
+          </div>
+          <div class="info-row">
+            <span class="label"><i class="fas fa-expand-arrows-alt"></i> Land Holding</span>
+            <span class="value" id="dispLand">—</span>
+          </div>
+        </div>
+
+        <!-- Edit farm form -->
+        <div class="edit-section" id="editFarmSection">
+          <div class="form-grid" style="margin-top:1rem;">
+            <div class="form-group">
+              <label class="form-label-custom">Soil Type</label>
+              <select id="editSoil" class="form-select-custom">
+                <option value="">Select…</option>
+                <option>Sandy</option><option>Loamy</option><option>Clay</option>
+                <option>Black</option><option>Red</option><option>Alluvial</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label-custom">Primary Crop</label>
+              <input type="text" id="editCrop" class="form-control-custom" placeholder="e.g. Wheat, Cotton">
+            </div>
+            <div class="form-group">
+              <label class="form-label-custom">Land Holding (acres)</label>
+              <input type="text" id="editLand" class="form-control-custom" placeholder="e.g. 3.5">
+            </div>
+          </div>
+          <div style="display:flex;gap:10px;margin-top:1rem;">
+            <button class="btn-primary-custom" onclick="saveFarmDetails()">
+              <i class="fas fa-save"></i> Save Changes
+            </button>
+            <button class="btn-outline-green" onclick="toggleEdit()">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- App Settings -->
+    <div class="profile-card">
+      <div class="profile-card-header">
+        <i class="fas fa-cog"></i>
+        <h3>App Settings</h3>
+      </div>
+      <div class="profile-card-body">
+        <div class="info-row">
+          <span class="label"><i class="fas fa-language"></i> Language</span>
+          <button class="btn-outline-green" style="padding:5px 14px;font-size:0.82rem;" onclick="toggleLang()">
+            <i class="fas fa-exchange-alt"></i> Switch to <span id="langSwitchLabel">हिंदी</span>
+          </button>
+        </div>
+        <div class="info-row">
+          <span class="label"><i class="fas fa-microphone"></i> Voice Assistant</span>
+          <span class="value" style="font-size:0.82rem;color:var(--green-500);">
+            <i class="fas fa-check-circle"></i> Enabled (Web Speech API)
+          </span>
+        </div>
+        <div class="info-row" style="border-bottom:none;">
+          <span class="label"><i class="fas fa-sign-out-alt"></i> Session</span>
+          <button class="btn-logout-big" onclick="logout()">
+            <i class="fas fa-sign-out-alt"></i> <span data-i18n="profile.logout">Logout</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Credit footer -->
+    <p style="text-align:center;color:var(--text-300);font-size:0.75rem;margin-top:2rem;padding-bottom:1rem;">
+      <i class="fas fa-lock" style="color:var(--green-500);"></i>
+      Demo app — data stored locally in your browser only.
+    </p>
+  </main>
+
+  <script src="js/i18n.js"></script>
+  <script src="js/common.js"></script>
+  <script src="js/voice.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      if (!requireAuth()) return;
+      loadProfile();
+    });
+
+    function loadProfile() {
+      const s = getSession();
+      if (!s) return;
+
+      // Avatar
+      const initial = (s.name || s.username || 'F')[0].toUpperCase();
+      document.getElementById('avatarInitial').textContent = initial;
+
+      // Names
+      document.getElementById('profileName').textContent = s.name || s.username;
+      document.getElementById('profileSub').textContent  = `@${s.username}${s.state ? ' · ' + s.state : ''}`;
+
+      // Stats
+      const days = s.memberSince
+        ? Math.ceil((Date.now() - new Date(s.memberSince)) / 86400000)
+        : '—';
+      document.getElementById('psMemberDays').textContent = typeof days === 'number' ? days + 'd' : '—';
+      document.getElementById('psLand').textContent  = s.landHolding || '—';
+      document.getElementById('psCrop').textContent  = s.primaryCrop || '—';
+
+      // View rows
+      document.getElementById('dispName').textContent   = s.name || '—';
+      document.getElementById('dispUsername').textContent = s.username;
+      document.getElementById('dispPhone').textContent  = s.phone || '—';
+      document.getElementById('dispState').textContent  = s.state || '—';
+      document.getElementById('dispMember').textContent = s.memberSince || '—';
+
+      // Farm
+      document.getElementById('dispSoil').textContent  = s.soilType || '—';
+      document.getElementById('dispCrop').textContent  = s.primaryCrop || '—';
+      document.getElementById('dispLand').textContent  = s.landHolding || '—';
+
+      // Pre-fill edit form
+      document.getElementById('editSoil').value = s.soilType || '';
+      document.getElementById('editCrop').value = s.primaryCrop || '';
+      document.getElementById('editLand').value = s.landHolding || '';
+
+      // Lang button
+      document.getElementById('langSwitchLabel').textContent = currentLang === 'en' ? 'हिंदी' : 'English';
+    }
+
+    function toggleEdit() {
+      const section = document.getElementById('editFarmSection');
+      section.classList.toggle('show');
+    }
+
+    function saveFarmDetails() {
+      const s = getSession();
+      s.soilType    = document.getElementById('editSoil').value;
+      s.primaryCrop = document.getElementById('editCrop').value.trim();
+      s.landHolding = document.getElementById('editLand').value.trim();
+      localStorage.setItem('km_session', JSON.stringify(s));
+
+      // Also update in km_users if registered locally
+      const users = JSON.parse(localStorage.getItem('km_users') || '[]');
+      const idx   = users.findIndex(u => u.username === s.username);
+      if (idx > -1) {
+        users[idx] = { ...users[idx], soilType: s.soilType, primaryCrop: s.primaryCrop, landHolding: s.landHolding };
+        localStorage.setItem('km_users', JSON.stringify(users));
+      }
+
+      showToast('Farm details updated! ✅', 'success');
+      loadProfile();
+      document.getElementById('editFarmSection').classList.remove('show');
+    }
+  </script>
+</body>
+</html>

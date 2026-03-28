@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KisanMitra — Pest & Disease Checker</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    .pest-hero { background:linear-gradient(135deg,#6b2111,var(--terra-500)); color:#fff; padding:2rem 1.5rem; border-radius:var(--radius-lg); margin-bottom:1.5rem; position:relative; overflow:hidden; }
+    .pest-hero::after { content:'🐛'; position:absolute; right:1.5rem; bottom:-10px; font-size:6rem; opacity:0.12; }
+    .pest-layout { display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; }
+    @media(max-width:768px){ .pest-layout{grid-template-columns:1fr;} }
+    .upload-card { background:var(--white); border-radius:var(--radius-lg); padding:2rem; box-shadow:var(--shadow-sm); border:1px solid var(--cream-200); }
+    .upload-zone { border:2px dashed var(--cream-200); border-radius:var(--radius-md); padding:2.5rem 2rem; text-align:center; cursor:pointer; transition:all var(--transition); background:var(--cream); position:relative; }
+    .upload-zone:hover, .upload-zone.drag-over { border-color:var(--green-500); background:var(--green-50); }
+    .upload-zone input[type="file"] { position:absolute; inset:0; opacity:0; cursor:pointer; z-index:1; width:100%; height:100%; }
+    .upload-icon-circle { width:72px; height:72px; background:var(--terra-100); border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 1rem; font-size:2rem; color:var(--terra-500); }
+    .divider-or { display:flex; align-items:center; gap:1rem; margin:1.25rem 0; color:var(--text-300); font-size:0.85rem; }
+    .divider-or::before, .divider-or::after { content:''; flex:1; height:1px; background:var(--cream-200); }
+    .symptom-textarea { width:100%; min-height:90px; padding:12px; border:1.5px solid var(--cream-200); border-radius:var(--radius-sm); font-family:'Hind',sans-serif; font-size:0.9rem; resize:vertical; outline:none; transition:border-color var(--transition); color:var(--text-900); background:white; }
+    .symptom-textarea:focus { border-color:var(--green-500); box-shadow:0 0 0 3px rgba(35,155,82,0.1); }
+    .quick-symptoms { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:1rem; }
+    .symptom-chip { padding:5px 12px; border-radius:20px; background:var(--cream-100); color:var(--text-700); font-size:0.78rem; cursor:pointer; border:1.5px solid var(--cream-200); transition:all var(--transition); }
+    .symptom-chip:hover { background:var(--terra-100); border-color:var(--terra-500); color:var(--terra-700); }
+    #imagePreview { margin:1rem 0; border-radius:var(--radius-md); overflow:hidden; max-height:200px; }
+    #imagePreview img { width:100%; height:200px; object-fit:cover; border-radius:var(--radius-md); }
+
+    /* Result card */
+    .pest-result-card { background:var(--white); border-radius:var(--radius-lg); border:2px solid var(--cream-200); padding:1.75rem; animation:slideUp 0.4s ease; }
+    .pest-result-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:1.25rem; gap:1rem; }
+    .pest-result-name { font-family:'Rajdhani',sans-serif; font-size:1.5rem; font-weight:700; color:var(--green-800); }
+    .pest-result-hindi { font-size:0.88rem; color:var(--text-500); margin-top:2px; }
+    .pest-meta { display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; }
+    .pest-type-badge { padding:3px 10px; background:var(--cream-100); color:var(--text-700); border-radius:20px; font-size:0.75rem; font-weight:600; }
+    .sev-badge { padding:3px 10px; border-radius:20px; font-size:0.75rem; font-weight:700; text-transform:uppercase; letter-spacing:0.04em; }
+    .sev-low { background:#e8f7ee; color:var(--green-700); }
+    .sev-medium { background:#fff8e1; color:#c77d00; }
+    .sev-high { background:#fff3e0; color:#bf360c; }
+    .sev-very-high { background:#fce4ec; color:#880e4f; }
+    .sev-extreme { background:#ede7f6; color:#311b92; }
+    .confidence-ring { position:relative; width:64px; height:64px; flex-shrink:0; }
+    .confidence-ring svg { width:100%; height:100%; }
+    .confidence-text { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-family:'Rajdhani',sans-serif; font-weight:700; font-size:0.9rem; }
+    .pest-section { margin-bottom:1rem; }
+    .pest-section h4 { font-size:0.85rem; font-weight:700; color:var(--green-800); margin-bottom:0.4rem; display:flex; align-items:center; gap:6px; text-transform:uppercase; letter-spacing:0.06em; }
+    .pest-section p { font-size:0.9rem; color:var(--text-700); line-height:1.6; background:var(--cream); padding:10px 14px; border-radius:var(--radius-sm); }
+    .pest-crop-tags { display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
+    .pest-action { display:flex; gap:10px; flex-wrap:wrap; margin-top:1.25rem; padding-top:1rem; border-top:1px solid var(--cream-200); }
+
+    /* How-to guide sidebar */
+    .guide-card { background:var(--white); border-radius:var(--radius-lg); padding:1.5rem; box-shadow:var(--shadow-sm); border:1px solid var(--cream-200); position:sticky; top:calc(var(--navbar-h) + 1rem); }
+    .guide-card h3 { font-size:1rem; color:var(--green-800); margin-bottom:1rem; display:flex; align-items:center; gap:8px; }
+    .guide-step { display:flex; gap:12px; padding:10px 0; border-bottom:1px solid var(--cream-100); }
+    .guide-step:last-child { border-bottom:none; }
+    .guide-num { width:28px; height:28px; background:var(--green-800); color:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.78rem; font-weight:700; flex-shrink:0; margin-top:2px; }
+    .guide-text { font-size:0.85rem; color:var(--text-700); line-height:1.5; }
+    .guide-text strong { color:var(--green-800); display:block; margin-bottom:2px; font-size:0.9rem; }
+    .common-pests { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:1rem; }
+    .common-pest-btn { padding:8px 10px; border:1.5px solid var(--cream-200); background:var(--cream); border-radius:var(--radius-sm); cursor:pointer; font-size:0.8rem; color:var(--text-700); transition:all var(--transition); text-align:left; }
+    .common-pest-btn:hover { border-color:var(--terra-500); background:var(--terra-100); color:var(--terra-700); }
+
+    .page-content { max-width:1200px; margin:0 auto; padding:1.5rem; }
+    @keyframes slideUp { from{opacity:0;transform:translateY(16px);} to{opacity:1;transform:translateY(0);} }
+  </style>
+</head>
+<body>
+  <div id="toastContainer" class="toast-container"></div>
+
+  <nav class="navbar">
+    <a href="dashboard.html" class="navbar-brand">
+      <div class="navbar-logo">🌾</div>
+      <div class="navbar-brand-text">
+        <span class="brand-main">KisanMitra</span>
+        <span class="brand-sub">Smart Farming</span>
+      </div>
+    </a>
+    <ul class="navbar-nav-links">
+      <li><a href="dashboard.html"><i class="fas fa-home"></i> <span data-i18n="nav.dashboard">Dashboard</span></a></li>
+      <li><a href="crops.html"><i class="fas fa-seedling"></i> <span data-i18n="nav.crops">Crop Advisor</span></a></li>
+      <li><a href="prices.html"><i class="fas fa-chart-bar"></i> <span data-i18n="nav.prices">Market Prices</span></a></li>
+      <li><a href="pest.html"><i class="fas fa-bug"></i> <span data-i18n="nav.pest">Pest Check</span></a></li>
+      <li><a href="schemes.html"><i class="fas fa-scroll"></i> <span data-i18n="nav.schemes">Schemes</span></a></li>
+    </ul>
+    <div class="navbar-actions">
+      <button class="lang-btn" id="langBtn" onclick="toggleLang()">हिंदी</button>
+      <button class="voice-btn" onclick="toggleVoice()" title="Voice Command"><i class="fas fa-microphone"></i></button>
+      <a href="profile.html" class="nav-avatar"><i class="fas fa-user-circle"></i></a>
+      <button onclick="logout()" class="btn-logout"><i class="fas fa-sign-out-alt"></i></button>
+    </div>
+  </nav>
+
+  <main class="page-content">
+    <div class="pest-hero">
+      <h1 style="color:#fff;font-size:1.8rem;margin-bottom:4px;position:relative;z-index:1;">
+        <i class="fas fa-bug" style="color:#ffa07a;"></i> <span data-i18n="pest.title">Pest & Disease Checker</span>
+      </h1>
+      <p style="opacity:0.85;font-size:0.9rem;position:relative;z-index:1;">Upload a plant photo or describe symptoms — get instant pest identification and treatment advice.</p>
+    </div>
+
+    <div class="pest-layout">
+      <!-- Left: Input -->
+      <div>
+        <div class="upload-card">
+          <h3 style="font-size:1rem;color:var(--green-800);margin-bottom:1.25rem;display:flex;align-items:center;gap:8px;">
+            <i class="fas fa-camera" style="color:var(--terra-500);"></i> <span data-i18n="pest.upload">Upload Plant Photo</span>
+          </h3>
+
+          <div class="upload-zone" id="uploadZone"
+            ondragover="event.preventDefault();this.classList.add('drag-over')"
+            ondragleave="this.classList.remove('drag-over')"
+            ondrop="handleDrop(event)">
+            <input type="file" id="pestInput" accept="image/*" onchange="previewImage(this)">
+            <div id="uploadPlaceholder">
+              <div class="upload-icon-circle"><i class="fas fa-cloud-upload-alt"></i></div>
+              <p style="font-weight:600;color:var(--text-700);margin-bottom:4px;">Drag & drop plant image here</p>
+              <p style="font-size:0.82rem;color:var(--text-300);">or click to browse · JPG, PNG, WEBP up to 10MB</p>
+            </div>
+            <div id="imagePreview"></div>
+          </div>
+
+          <div class="divider-or"><span data-i18n="pest.or">or describe symptoms</span></div>
+
+          <!-- Quick symptom chips -->
+          <div style="margin-bottom:0.75rem;">
+            <p style="font-size:0.78rem;color:var(--text-500);font-weight:600;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px;">Quick select:</p>
+            <div class="quick-symptoms">
+              <span class="symptom-chip" onclick="addSymptom('yellow leaves')">🟡 Yellow leaves</span>
+              <span class="symptom-chip" onclick="addSymptom('holes in leaves')">🕳️ Holes in leaves</span>
+              <span class="symptom-chip" onclick="addSymptom('white powder on leaves')">⬜ White powder</span>
+              <span class="symptom-chip" onclick="addSymptom('plant wilting droop')">🥀 Wilting/Drooping</span>
+              <span class="symptom-chip" onclick="addSymptom('leaf curling')">🌀 Leaf curl</span>
+              <span class="symptom-chip" onclick="addSymptom('brown spots lesion')">🟤 Brown spots</span>
+              <span class="symptom-chip" onclick="addSymptom('stem borer holes')">🪲 Stem borer</span>
+              <span class="symptom-chip" onclick="addSymptom('small insects aphid')">🐜 Small insects</span>
+            </div>
+          </div>
+
+          <textarea id="symptomText" class="symptom-textarea"
+            data-i18n-ph="pest.symptom.ph"
+            placeholder="e.g. yellow leaves, holes in stem, white spots…"></textarea>
+
+          <div style="display:flex;gap:10px;margin-top:1rem;">
+            <button id="pestBtn" class="btn-primary-custom" style="flex:1;justify-content:center;padding:12px;" onclick="detectPest()">
+              <i class="fas fa-microscope"></i>
+              <span data-i18n="pest.btn">Analyse</span>
+            </button>
+            <button class="btn-outline-green" style="padding:12px 16px;" onclick="clearPestForm()" title="Clear">
+              <i class="fas fa-redo"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Result area -->
+        <div id="pestResult" style="margin-top:1.25rem;"></div>
+      </div>
+
+      <!-- Right: Guide -->
+      <div>
+        <div class="guide-card">
+          <h3><i class="fas fa-info-circle" style="color:var(--green-500);"></i> How to get best results</h3>
+          <div class="guide-step">
+            <div class="guide-num">1</div>
+            <div class="guide-text"><strong>Take a clear close-up photo</strong> Focus on the affected area — leaves, stem, or roots showing damage.</div>
+          </div>
+          <div class="guide-step">
+            <div class="guide-num">2</div>
+            <div class="guide-text"><strong>Describe what you see</strong> Use the quick chips or type symptoms like "yellow leaves" or "holes in stem".</div>
+          </div>
+          <div class="guide-step">
+            <div class="guide-num">3</div>
+            <div class="guide-text"><strong>Get treatment advice</strong> Follow recommended pesticide doses and prevention tips exactly.</div>
+          </div>
+          <div class="guide-step">
+            <div class="guide-num">4</div>
+            <div class="guide-text"><strong>Consult your KVK</strong> For severe outbreaks, contact your local Krishi Vigyan Kendra for expert field support.</div>
+          </div>
+
+          <div style="margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--cream-200);">
+            <p style="font-size:0.78rem;color:var(--text-500);font-weight:600;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;">Common Pests — Quick Detect</p>
+            <div class="common-pests">
+              <button class="common-pest-btn" onclick="quickDetect('aphid')">🐛 Aphids</button>
+              <button class="common-pest-btn" onclick="quickDetect('blast')">🌾 Rice Blast</button>
+              <button class="common-pest-btn" onclick="quickDetect('borer')">🪲 Stem Borer</button>
+              <button class="common-pest-btn" onclick="quickDetect('rust')">🟠 Wheat Rust</button>
+              <button class="common-pest-btn" onclick="quickDetect('whitefly')">🪰 Whitefly</button>
+              <button class="common-pest-btn" onclick="quickDetect('powdery mildew')">⬜ Powdery Mildew</button>
+              <button class="common-pest-btn" onclick="quickDetect('bollworm')">🌿 Bollworm</button>
+              <button class="common-pest-btn" onclick="quickDetect('thrips')">🔴 Thrips</button>
+            </div>
+          </div>
+
+          <div style="margin-top:1rem;padding:12px;background:var(--gold-100);border-radius:var(--radius-sm);font-size:0.82rem;color:var(--text-700);display:flex;gap:10px;">
+            <i class="fas fa-exclamation-triangle" style="color:var(--gold-600);flex-shrink:0;margin-top:2px;"></i>
+            <span>This is a <strong>demo tool</strong> for educational purposes. Always verify with a certified agronomist before applying chemicals.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="js/i18n.js"></script>
+  <script src="js/common.js"></script>
+  <script src="js/pest.js"></script>
+  <script src="js/voice.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => { requireAuth(); });
+
+    function addSymptom(text) {
+      const el = document.getElementById('symptomText');
+      const cur = el.value.trim();
+      el.value = cur ? cur + ', ' + text : text;
+      el.focus();
+    }
+
+    function quickDetect(keyword) {
+      document.getElementById('symptomText').value = keyword;
+      detectPest();
+    }
+
+    function clearPestForm() {
+      document.getElementById('pestInput').value = '';
+      document.getElementById('symptomText').value = '';
+      document.getElementById('imagePreview').innerHTML = '';
+      document.getElementById('pestResult').innerHTML = '';
+      document.getElementById('uploadPlaceholder').style.display = '';
+    }
+
+    function handleDrop(e) {
+      e.preventDefault();
+      document.getElementById('uploadZone').classList.remove('drag-over');
+      const file = e.dataTransfer.files[0];
+      if (file && file.type.startsWith('image/')) {
+        const dt = new DataTransfer();
+        dt.items.add(file);
+        const inp = document.getElementById('pestInput');
+        inp.files = dt.files;
+        previewImage(inp);
+      }
+    }
+  </script>
+</body>
+</html>

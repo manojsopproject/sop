@@ -1,0 +1,51 @@
+[
+  {
+    "id": 1,
+    "username": "farmer1",
+    "password": "pass123",
+    "name": "Ramu Patel",
+    "nameHi": "रामू पटेल",
+    "state": "Maharashtra",
+    "district": "Nashik",
+    "village": "Dindori",
+    "landHolding": "4.5 acres",
+    "soilType": "Black",
+    "primaryCrop": "Cotton",
+    "phone": "9876543210",
+    "email": "ramu@example.com",
+    "memberSince": "2023-04-01"
+  },
+  {
+    "id": 2,
+    "username": "sunita",
+    "password": "sunita123",
+    "name": "Sunita Devi",
+    "nameHi": "सुनीता देवी",
+    "state": "Uttar Pradesh",
+    "district": "Lucknow",
+    "village": "Malihabad",
+    "landHolding": "2.0 acres",
+    "soilType": "Alluvial",
+    "primaryCrop": "Wheat",
+    "phone": "9123456780",
+    "email": "sunita@example.com",
+    "memberSince": "2023-06-15"
+  },
+  {
+    "id": 3,
+    "username": "admin",
+    "password": "admin123",
+    "name": "Kisan Admin",
+    "nameHi": "किसान एडमिन",
+    "state": "Delhi",
+    "district": "Central Delhi",
+    "village": "N/A",
+    "landHolding": "0",
+    "soilType": "N/A",
+    "primaryCrop": "N/A",
+    "phone": "9000000001",
+    "email": "admin@kisan.gov.in",
+    "memberSince": "2023-01-01",
+    "role": "admin"
+  }
+]

@@ -1,0 +1,3 @@
+# Railway static site deployment via Nginx
+[start]
+cmd = "nginx -g 'daemon off;'"

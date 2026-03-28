@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kisan Seva — Login</title>
+  <meta name="description" content="Kisan Seva — Smart Farming Companion for Indian Farmers">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/intro.css">
+  <!-- Preload the intro video so it buffers immediately -->
+  <link rel="preload" as="video" href="assets/videos/intro.mp4" type="video/mp4">
+  <style>
+    /* Extra login page animations */
+    .auth-left-content { animation: fadeSlideIn 0.8s ease both; }
+    .auth-card { animation: fadeSlideIn 0.8s ease 0.2s both; }
+    @keyframes fadeSlideIn {
+      from { opacity:0; transform:translateY(20px); }
+      to   { opacity:1; transform:translateY(0); }
+    }
+    .demo-chips { display:flex; gap:8px; flex-wrap:wrap; margin-top:0.75rem; }
+    .demo-chip  {
+      padding:5px 12px; border-radius:20px; border:1.5px dashed rgba(255,255,255,0.3);
+      color:rgba(255,255,255,0.7); font-size:0.78rem; cursor:pointer;
+      transition:all 0.2s; background:none;
+    }
+    .demo-chip:hover { background:rgba(240,165,0,0.15); border-color:var(--gold); color:var(--gold); }
+    .pw-wrapper { position:relative; }
+    .pw-toggle  {
+      position:absolute; right:12px; top:50%; transform:translateY(-50%);
+      background:none; border:none; color:var(--text-300); cursor:pointer; padding:2px;
+    }
+    .input-icon-wrap { position:relative; }
+    .input-icon-wrap i { position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--text-300); font-size:0.85rem; }
+    .input-icon-wrap input { padding-left:36px; }
+    .auth-card input { font-size:0.9rem; }
+
+    /* Mobile responsive */
+    @media (max-width:768px) {
+      .auth-right { background: linear-gradient(160deg,var(--green-800),var(--green-600)); min-height:100vh; display:flex; align-items:center; }
+      .auth-card  { background:var(--cream); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ╔═══════════════════════════════════════════════════════╗ -->
+  <!-- ║          INTRO VIDEO OVERLAY — Kisan Seva            ║ -->
+  <!-- ╚═══════════════════════════════════════════════════════╝ -->
+  <div id="intro-overlay" role="dialog" aria-modal="true" aria-label="Kisan Seva intro video">
+
+    <!-- Fullscreen background video -->
+    <video
+      id="intro-video"
+      playsinline
+      muted
+      preload="auto"
+      aria-hidden="true"
+    >
+      <source src="assets/videos/intro.mp4" type="video/mp4">
+    </video>
+
+    <!-- Brand logo bug (top-left) -->
+    <div id="intro-brand">
+      <span class="brand-icon">🌾</span>
+      <div>
+        <div class="brand-name">Kisan Seva</div>
+        <div class="brand-tagline">Smart Farming Companion</div>
+      </div>
+    </div>
+
+    <!-- Loading spinner (shown while video buffers) -->
+    <div id="intro-spinner">
+      <div class="spinner-wrap">
+        <div class="spinner-ring"></div>
+        <div class="spinner-inner"></div>
+        <div class="spinner-icon">🌾</div>
+      </div>
+      <span class="spinner-text">Loading…</span>
+    </div>
+
+    <!-- Video progress bar -->
+    <div id="intro-progress-wrap" aria-hidden="true">
+      <div class="progress-track">
+        <div id="intro-progress-bar"></div>
+      </div>
+    </div>
+
+    <!-- Mute / Unmute toggle -->
+    <button id="intro-mute-btn" title="Mute" aria-label="Toggle mute">
+      <i class="fas fa-volume-mute"></i>
+    </button>
+
+    <!-- Skip intro button -->
+    <button id="intro-skip-btn" aria-label="Skip intro">
+      Skip Intro
+      <i class="fas fa-chevron-right skip-arrow"></i>
+    </button>
+
+  </div>
+  <!-- ── End Intro Overlay ──────────────────────────────── -->
+
+  <div id="toastContainer" class="toast-container"></div>
+
+  <div class="auth-wrapper">
+    <!-- ── LEFT PANEL ── -->
+    <div class="auth-left">
+      <div class="auth-left-content">
+        <div class="auth-logo">
+          <div class="auth-logo-icon">🌾</div>
+          <div class="auth-logo-text">
+            <h1>Kisan Seva</h1>
+            <span>Smart Farming Companion</span>
+          </div>
+        </div>
+
+        <h2 class="auth-tagline">
+          Empowering Every<br>
+          <span>Indian Farmer</span><br>
+          with Smart Technology
+        </h2>
+
+        <p style="color:rgba(255,255,255,0.7);font-size:0.9rem;line-height:1.6;margin-bottom:2rem;">
+          Get real-time crop recommendations, live market prices, pest detection, 
+          and government scheme information — all in one place, in your language.
+        </p>
+
+        <ul class="auth-features">
+          <li><i class="fas fa-seedling"></i> AI-powered Crop Advisor based on soil & season</li>
+          <li><i class="fas fa-chart-bar"></i> Live Mandi Prices for 20+ crops</li>
+          <li><i class="fas fa-bug"></i> Pest & Disease Detection with treatment guide</li>
+          <li><i class="fas fa-scroll"></i> 8+ Government Schemes (PM-KISAN, PMFBY & more)</li>
+          <li><i class="fas fa-cloud-sun"></i> Hyper-local Weather with farming advisory</li>
+          <li><i class="fas fa-microphone"></i> Voice control in Hindi & English</li>
+        </ul>
+
+        <div style="margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid rgba(255,255,255,0.15);">
+          <p style="color:rgba(255,255,255,0.5);font-size:0.75rem;margin-bottom:0.5rem;">
+            Try demo accounts:
+          </p>
+          <div class="demo-chips">
+            <button class="demo-chip" onclick="tryDemo('farmer1','pass123')">
+              🌾 farmer1 / pass123
+            </button>
+            <button class="demo-chip" onclick="tryDemo('sunita','sunita123')">
+              👩‍🌾 sunita / sunita123
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── RIGHT PANEL ── -->
+    <div class="auth-right">
+      <div class="auth-card">
+        <div style="text-align:center;margin-bottom:1.75rem;">
+          <div style="font-size:2.2rem;margin-bottom:8px;">🌾</div>
+          <h2 style="font-size:1.5rem;color:var(--green-800);margin:0;">Welcome to Kisan Seva</h2>
+          <p style="color:var(--text-500);font-size:0.85rem;margin-top:4px;"><b></bould>SOP PROJECT<br>Nalla Malla Reddy Engineering College<br>Team members<br>BEKKARI AKSHITHA-24B61A0413<br>MAGGIDI AKSHAYA -24B61A0436<br>P HARSHA VARDHAN REDDY-24B61A0445<br>Sankeesa Manoj- 24b61a0455</b></p>
+        </div>
+
+        <!-- Tabs -->
+        <div class="auth-tabs">
+          <button class="auth-tab active" data-tab="login" onclick="switchTab('login')">
+            <i class="fas fa-sign-in-alt"></i> Login
+          </button>
+          <button class="auth-tab" data-tab="register" onclick="switchTab('register')">
+            <i class="fas fa-user-plus"></i> Register
+          </button>
+        </div>
+
+        <!-- ── LOGIN FORM ── -->
+        <div class="auth-form-panel active" id="panel-login">
+          <form onsubmit="loginUser(event)" novalidate>
+            <div class="form-group">
+              <label class="form-label-custom" data-i18n="auth.username">Username</label>
+              <div class="input-icon-wrap">
+                <i class="fas fa-user"></i>
+                <input type="text" id="loginUsername" class="form-control-custom"
+                  placeholder="e.g. farmer1" autocomplete="username">
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label-custom" data-i18n="auth.password">Password</label>
+              <div class="pw-wrapper">
+                <input type="password" id="loginPassword" class="form-control-custom"
+                  placeholder="Enter password" autocomplete="current-password">
+                <button type="button" class="pw-toggle" onclick="togglePw('loginPassword',this)">
+                  <i class="fas fa-eye"></i>
+                </button>
+              </div>
+            </div>
+
+            <div id="loginError" style="display:none;color:var(--terra-500);font-size:0.83rem;margin-bottom:0.75rem;padding:8px 12px;background:var(--terra-100);border-radius:6px;">
+            </div>
+
+            <button type="submit" id="loginBtn" class="btn-primary-custom" style="width:100%;justify-content:center;padding:12px;">
+              <i class="fas fa-sign-in-alt"></i>
+              <span data-i18n="auth.login.btn">Login to Kisan Seva</span>
+            </button>
+
+            <div class="divider-text" style="margin:1.25rem 0;">or use demo account</div>
+
+            <div style="display:flex;gap:8px;">
+              <button type="button" class="btn-outline-green" style="flex:1;justify-content:center;font-size:0.8rem;padding:8px;" onclick="fillDemo('farmer1','pass123')">
+                🌾 Farmer Demo
+              </button>
+              <button type="button" class="btn-outline-green" style="flex:1;justify-content:center;font-size:0.8rem;padding:8px;" onclick="fillDemo('sunita','sunita123')">
+                👩‍🌾 Sunita Demo
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- ── REGISTER FORM ── -->
+        <div class="auth-form-panel" id="panel-register">
+          <form onsubmit="registerUser(event)" novalidate>
+            <div class="form-group">
+              <label class="form-label-custom" data-i18n="auth.name">Full Name</label>
+              <div class="input-icon-wrap">
+                <i class="fas fa-user"></i>
+                <input type="text" id="regName" class="form-control-custom"
+                  placeholder="e.g. Rajesh Kumar" autocomplete="name">
+              </div>
+            </div>
+            <div class="grid-2">
+              <div class="form-group">
+                <label class="form-label-custom" data-i18n="auth.username">Username</label>
+                <input type="text" id="regUsername" class="form-control-custom" placeholder="min. 4 chars">
+              </div>
+              <div class="form-group">
+                <label class="form-label-custom" data-i18n="auth.phone">Phone</label>
+                <input type="tel" id="regPhone" class="form-control-custom" placeholder="10-digit">
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label-custom" data-i18n="auth.state">State</label>
+              <select id="regState" class="form-select-custom">
+                <option value="">Select State</option>
+                <option>Andhra Pradesh</option><option>Assam</option><option>Bihar</option>
+                <option>Chhattisgarh</option><option>Gujarat</option><option>Haryana</option>
+                <option>Himachal Pradesh</option><option>Jharkhand</option><option>Karnataka</option>
+                <option>Kerala</option><option>Madhya Pradesh</option><option>Maharashtra</option>
+                <option>Odisha</option><option>Punjab</option><option>Rajasthan</option>
+                <option>Tamil Nadu</option><option>Telangana</option><option>Uttar Pradesh</option>
+                <option>Uttarakhand</option><option>West Bengal</option><option>Other</option>
+              </select>
+            </div>
+            <div class="grid-2">
+              <div class="form-group">
+                <label class="form-label-custom" data-i18n="auth.password">Password</label>
+                <div class="pw-wrapper">
+                  <input type="password" id="regPassword" class="form-control-custom" placeholder="min. 6 chars">
+                  <button type="button" class="pw-toggle" onclick="togglePw('regPassword',this)"><i class="fas fa-eye"></i></button>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label-custom">Confirm</label>
+                <div class="pw-wrapper">
+                  <input type="password" id="regConfirm" class="form-control-custom" placeholder="Re-enter">
+                  <button type="button" class="pw-toggle" onclick="togglePw('regConfirm',this)"><i class="fas fa-eye"></i></button>
+                </div>
+              </div>
+            </div>
+
+            <div id="regError" style="display:none;color:var(--terra-500);font-size:0.83rem;margin-bottom:0.75rem;padding:8px 12px;background:var(--terra-100);border-radius:6px;"></div>
+
+            <button type="submit" id="registerBtn" class="btn-gold" style="width:100%;justify-content:center;padding:12px;color:var(--green-900);">
+              <i class="fas fa-user-plus"></i>
+              <span data-i18n="auth.reg.btn">Create Account</span>
+            </button>
+          </form>
+        </div>
+
+        <!-- Bottom note -->
+        <p style="text-align:center;color:var(--text-500);font-size:0.75rem;margin-top:1.5rem;">
+          <i class="fas fa-lock" style="color:var(--green-500);"></i>
+          Demo app — no real data is stored or transmitted.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/i18n.js"></script>
+  <script src="js/common.js"></script>
+  <script src="js/auth.js"></script>
+  <!-- Intro video controller — must load LAST so DOM is ready -->
+  <script src="js/intro.js"></script>
+  <script>
+    function togglePw(id, btn) {
+      const inp = document.getElementById(id);
+      const isText = inp.type === 'text';
+      inp.type = isText ? 'password' : 'text';
+      btn.innerHTML = isText ? '<i class="fas fa-eye"></i>' : '<i class="fas fa-eye-slash"></i>';
+    }
+
+    function tryDemo(u, p) {
+      switchTab('login');
+      document.getElementById('loginUsername').value = u;
+      document.getElementById('loginPassword').value = p;
+      document.getElementById('loginBtn').focus();
+    }
+  </script>
+</body>
+</html>

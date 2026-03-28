@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KisanMitra — Weather Advisory</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    .page-content { max-width:1100px; margin:0 auto; padding:1.5rem; }
+    .weather-hero { background:linear-gradient(135deg,#1a4b8f,#2568c8); color:#fff; padding:2rem 1.5rem; border-radius:var(--radius-lg); margin-bottom:1.5rem; position:relative; overflow:hidden; }
+    .weather-hero::after { content:'⛅'; position:absolute; right:1.5rem; bottom:-10px; font-size:6rem; opacity:0.15; }
+
+    .weather-search-bar { background:var(--white); border-radius:var(--radius-md); padding:1.25rem; box-shadow:var(--shadow-sm); border:1px solid var(--cream-200); margin-bottom:1.5rem; display:flex; gap:1rem; flex-wrap:wrap; align-items:flex-end; }
+    .city-input-wrap { position:relative; flex:1; min-width:200px; }
+    .city-input-wrap i { position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--text-300); }
+    .city-input-wrap input { padding-left:36px; width:100%; }
+
+    /* Weather card */
+    .weather-card { border-radius:var(--radius-lg); padding:1.75rem; color:white; margin-bottom:1.25rem; position:relative; overflow:hidden; }
+    .weather-card::before { content:''; position:absolute; width:250px; height:250px; background:rgba(255,255,255,0.06); border-radius:50%; top:-80px; right:-80px; }
+    .weather-card::after  { content:''; position:absolute; width:180px; height:180px; background:rgba(255,255,255,0.04); border-radius:50%; bottom:-60px; left:-40px; }
+    .weather-main { display:flex; align-items:center; justify-content:space-between; position:relative; z-index:1; }
+    .weather-city { font-size:1.1rem; font-weight:600; opacity:0.9; margin-bottom:4px; }
+    .weather-temp { font-family:'Rajdhani',sans-serif; font-size:4rem; font-weight:700; line-height:1; }
+    .weather-desc { opacity:0.8; font-size:1rem; margin-top:4px; text-transform:capitalize; }
+    .weather-icon { width:90px; height:90px; filter:drop-shadow(0 4px 12px rgba(0,0,0,0.2)); }
+    .weather-stats { display:flex; gap:1.5rem; margin-top:1.25rem; padding-top:1.25rem; border-top:1px solid rgba(255,255,255,0.2); position:relative; z-index:1; flex-wrap:wrap; }
+    .weather-stat { display:flex; align-items:center; gap:8px; font-size:0.88rem; opacity:0.85; }
+    .weather-stat i { font-size:1rem; opacity:0.75; }
+
+    /* Advisory card */
+    .weather-advisory { background:var(--white); border-radius:var(--radius-md); padding:1.25rem 1.4rem; box-shadow:var(--shadow-sm); border:1px solid var(--cream-200); display:flex; gap:12px; align-items:flex-start; margin-bottom:1.25rem; }
+    .weather-advisory-icon { width:44px; height:44px; background:var(--green-100); border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:1.2rem; color:var(--green-600); flex-shrink:0; }
+    .weather-advisory-text { font-size:0.92rem; color:var(--text-700); line-height:1.6; }
+    .weather-advisory-text strong { display:block; color:var(--green-800); font-size:0.95rem; margin-bottom:4px; }
+
+    /* Quick cities */
+    .quick-cities { display:flex; gap:8px; flex-wrap:wrap; margin-top:1rem; }
+    .city-chip { padding:5px 14px; border-radius:20px; background:rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.2); color:rgba(255,255,255,0.8); font-size:0.8rem; cursor:pointer; transition:all var(--transition); }
+    .city-chip:hover { background:rgba(255,255,255,0.2); color:white; }
+
+    /* Forecast section */
+    .forecast-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(130px,1fr)); gap:1rem; }
+    .forecast-card { background:var(--white); border-radius:var(--radius-md); padding:1.1rem; text-align:center; box-shadow:var(--shadow-sm); border:1px solid var(--cream-200); }
+    .forecast-day { font-size:0.78rem; font-weight:700; color:var(--text-500); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:8px; }
+    .forecast-icon { font-size:1.8rem; margin-bottom:6px; }
+    .forecast-temp { font-family:'Rajdhani',sans-serif; font-size:1.2rem; font-weight:700; color:var(--green-800); }
+    .forecast-desc { font-size:0.73rem; color:var(--text-500); margin-top:4px; }
+
+    .weather-error { text-align:center; padding:2.5rem; background:var(--white); border-radius:var(--radius-md); box-shadow:var(--shadow-sm); border:1px solid var(--cream-200); }
+    .section-title { font-size:1.05rem; font-weight:700; color:var(--green-800); margin:1.5rem 0 1rem; display:flex; align-items:center; gap:8px; }
+
+    @keyframes fadeUp { from{opacity:0;transform:translateY(16px);} to{opacity:1;transform:translateY(0);} }
+  </style>
+</head>
+<body>
+  <div id="toastContainer" class="toast-container"></div>
+
+  <nav class="navbar">
+    <a href="dashboard.html" class="navbar-brand">
+      <div class="navbar-logo">🌾</div>
+      <div class="navbar-brand-text">
+        <span class="brand-main">KisanMitra</span>
+        <span class="brand-sub">Smart Farming</span>
+      </div>
+    </a>
+    <ul class="navbar-nav-links">
+      <li><a href="dashboard.html"><i class="fas fa-home"></i> <span data-i18n="nav.dashboard">Dashboard</span></a></li>
+      <li><a href="crops.html"><i class="fas fa-seedling"></i> <span data-i18n="nav.crops">Crop Advisor</span></a></li>
+      <li><a href="prices.html"><i class="fas fa-chart-bar"></i> <span data-i18n="nav.prices">Market Prices</span></a></li>
+      <li><a href="pest.html"><i class="fas fa-bug"></i> <span data-i18n="nav.pest">Pest Check</span></a></li>
+      <li><a href="schemes.html"><i class="fas fa-scroll"></i> <span data-i18n="nav.schemes">Schemes</span></a></li>
+    </ul>
+    <div class="navbar-actions">
+      <button class="lang-btn" id="langBtn" onclick="toggleLang()">हिंदी</button>
+      <button class="voice-btn" onclick="toggleVoice()" title="Voice Command"><i class="fas fa-microphone"></i></button>
+      <a href="profile.html" class="nav-avatar"><i class="fas fa-user-circle"></i></a>
+      <button onclick="logout()" class="btn-logout"><i class="fas fa-sign-out-alt"></i></button>
+    </div>
+  </nav>
+
+  <main class="page-content">
+    <div class="weather-hero">
+      <h1 style="color:#fff;font-size:1.8rem;margin-bottom:4px;position:relative;z-index:1;">
+        <i class="fas fa-cloud-sun" style="color:#93c5fd;"></i> <span data-i18n="weather.title">Weather Advisory</span>
+      </h1>
+      <p style="opacity:0.85;font-size:0.9rem;position:relative;z-index:1;">Real-time weather with personalised farming advice for your location.</p>
+      <div class="quick-cities" style="position:relative;z-index:1;">
+        <span style="font-size:0.78rem;color:rgba(255,255,255,0.55);align-self:center;">Quick:</span>
+        <span class="city-chip" onclick="quickCity('Delhi')">Delhi</span>
+        <span class="city-chip" onclick="quickCity('Mumbai')">Mumbai</span>
+        <span class="city-chip" onclick="quickCity('Hyderabad')">Hyderabad</span>
+        <span class="city-chip" onclick="quickCity('Pune')">Pune</span>
+        <span class="city-chip" onclick="quickCity('Lucknow')">Lucknow</span>
+        <span class="city-chip" onclick="quickCity('Patna')">Patna</span>
+        <span class="city-chip" onclick="quickCity('Jaipur')">Jaipur</span>
+        <span class="city-chip" onclick="quickCity('Bhopal')">Bhopal</span>
+      </div>
+    </div>
+
+    <div class="weather-search-bar">
+      <div class="city-input-wrap">
+        <i class="fas fa-search"></i>
+        <input type="text" id="weatherCity" class="form-control-custom"
+          data-i18n-ph="weather.city" placeholder="Enter city name…"
+          onkeydown="if(event.key==='Enter') getWeather()">
+      </div>
+      <button id="weatherBtn" class="btn-primary-custom" onclick="getWeather()" style="padding:10px 22px;">
+        <i class="fas fa-search"></i> <span data-i18n="weather.btn">Get Weather</span>
+      </button>
+      <button class="btn-outline-green" onclick="getWeatherByLocation()" title="Use my location" style="padding:10px 14px;">
+        <i class="fas fa-map-marker-alt"></i> My Location
+      </button>
+    </div>
+
+    <div id="weatherResult">
+      <div style="text-align:center;padding:3rem;background:var(--white);border-radius:var(--radius-md);box-shadow:var(--shadow-sm);border:1px solid var(--cream-200);color:var(--text-500);">
+        <i class="fas fa-cloud-sun" style="font-size:3rem;color:var(--text-300);margin-bottom:1rem;display:block;"></i>
+        <p>Enter a city name above or use <strong>My Location</strong> to get current weather and farming advice.</p>
+      </div>
+    </div>
+
+    <!-- Forecast (shown after weather loads) -->
+    <div id="forecastSection" style="display:none;">
+      <div class="section-title">
+        <i class="fas fa-calendar-week" style="color:var(--green-500);"></i>
+        5-Day Forecast
+      </div>
+      <div class="forecast-grid" id="forecastGrid"></div>
+    </div>
+
+    <!-- Farming Calendar -->
+    <div class="section-title" style="margin-top:2rem;">
+      <i class="fas fa-seedling" style="color:var(--green-500);"></i>
+      Seasonal Farming Advisory
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:1rem;">
+      <div class="weather-advisory">
+        <div class="weather-advisory-icon" style="background:#fff3e0;color:#f57c00;"><i class="fas fa-sun"></i></div>
+        <div class="weather-advisory-text">
+          <strong>Kharif Season (Jun–Oct)</strong>
+          Monsoon onset is crucial. Prepare fields for transplanting rice and sowing maize. Apply pre-emergence herbicides before first rain.
+        </div>
+      </div>
+      <div class="weather-advisory">
+        <div class="weather-advisory-icon" style="background:#e3f2fd;color:#1565c0;"><i class="fas fa-snowflake"></i></div>
+        <div class="weather-advisory-text">
+          <strong>Rabi Season (Oct–Mar)</strong>
+          Cool dry winters ideal for wheat, mustard, peas. Irrigate at crown root initiation (CRI) stage for wheat yield boost.
+        </div>
+      </div>
+      <div class="weather-advisory">
+        <div class="weather-advisory-icon" style="background:#e8f5e9;color:var(--green-600);"><i class="fas fa-tint"></i></div>
+        <div class="weather-advisory-text">
+          <strong>Irrigation Planning</strong>
+          Monitor soil moisture weekly. Sandy soils need irrigation every 5–7 days; clay soils every 10–14 days depending on crop stage.
+        </div>
+      </div>
+      <div class="weather-advisory">
+        <div class="weather-advisory-icon" style="background:var(--terra-100);color:var(--terra-500);"><i class="fas fa-exclamation-triangle"></i></div>
+        <div class="weather-advisory-text">
+          <strong>Frost Alert (Dec–Jan)</strong>
+          Cover sensitive crops (vegetables, nurseries) with polythene sheets. Avoid light irrigation on frost nights — it worsens damage.
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="js/i18n.js"></script>
+  <script src="js/common.js"></script>
+  <script src="js/weather.js"></script>
+  <script src="js/voice.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      requireAuth();
+      // Auto-load weather for user's state city
+      const s = getSession && getSession();
+      if (s && s.state) {
+        const stateCity = { 'Maharashtra':'Pune', 'Uttar Pradesh':'Lucknow', 'Punjab':'Amritsar',
+          'Haryana':'Rohtak', 'Rajasthan':'Jaipur', 'Madhya Pradesh':'Bhopal',
+          'Bihar':'Patna', 'Gujarat':'Ahmedabad', 'Telangana':'Hyderabad',
+          'Karnataka':'Bengaluru', 'Tamil Nadu':'Chennai', 'West Bengal':'Kolkata' };
+        const city = stateCity[s.state];
+        if (city) { document.getElementById('weatherCity').value = city; getWeather(city); }
+      }
+    });
+
+    function quickCity(city) {
+      document.getElementById('weatherCity').value = city;
+      getWeather(city);
+    }
+  </script>
+</body>
+</html>

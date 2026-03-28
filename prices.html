@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KisanMitra — Market Prices</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    .prices-hero { background:linear-gradient(135deg,#c77d00,var(--gold)); color:#fff; padding:2rem 1.5rem; border-radius:var(--radius-lg); margin-bottom:1.5rem; }
+    .prices-filters { background:var(--white); border-radius:var(--radius-md); padding:1.25rem; box-shadow:var(--shadow-sm); border:1px solid var(--cream-200); margin-bottom:1.25rem; display:flex; gap:1rem; flex-wrap:wrap; align-items:flex-end; }
+    .filter-group { display:flex; flex-direction:column; gap:4px; flex:1; min-width:140px; }
+    .filter-label { font-size:0.75rem; font-weight:600; color:var(--text-500); text-transform:uppercase; letter-spacing:0.05em; }
+    .search-wrap { position:relative; }
+    .search-wrap i { position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--text-300); }
+    .search-wrap input { padding-left:36px; }
+    .voice-search-btn { position:absolute; right:8px; top:50%; transform:translateY(-50%); background:none; border:none; color:var(--text-300); cursor:pointer; padding:4px; font-size:0.9rem; }
+    .voice-search-btn:hover { color:var(--green-500); }
+    .prices-layout { display:grid; grid-template-columns:1fr 220px; gap:1.5rem; }
+    @media(max-width:768px){ .prices-layout{grid-template-columns:1fr;} .price-stats{display:none;} }
+    .prices-table-wrap { background:var(--white); border-radius:var(--radius-md); box-shadow:var(--shadow-sm); border:1px solid var(--cream-200); overflow:hidden; }
+    .prices-table { width:100%; border-collapse:collapse; font-size:0.88rem; }
+    .prices-table th { background:var(--green-800); color:#fff; padding:12px 16px; text-align:left; font-size:0.78rem; text-transform:uppercase; letter-spacing:0.07em; white-space:nowrap; }
+    .prices-table td { padding:12px 16px; border-bottom:1px solid var(--cream-100); vertical-align:middle; }
+    .prices-table tr:last-child td { border-bottom:none; }
+    .prices-table tr:hover td { background:var(--green-50); }
+    .trend-up { color:var(--green-600); font-weight:700; }
+    .trend-down { color:var(--terra-500); font-weight:700; }
+    .trend-stable { color:var(--text-500); font-weight:600; }
+    .trend-badge { display:inline-flex; align-items:center; gap:4px; padding:3px 8px; border-radius:20px; font-size:0.78rem; }
+    .trend-up.trend-badge { background:var(--green-100); }
+    .trend-down.trend-badge { background:var(--terra-100); }
+    .trend-stable.trend-badge { background:var(--cream-100); }
+    .price-category-badge { padding:2px 8px; border-radius:20px; background:var(--cream-100); color:var(--text-700); font-size:0.72rem; font-weight:600; white-space:nowrap; }
+    .price-stats { display:flex; flex-direction:column; gap:1rem; }
+    .price-stat-card { background:var(--white); border-radius:var(--radius-md); padding:1.25rem; box-shadow:var(--shadow-sm); border:1px solid var(--cream-200); }
+    .price-stat-card h4 { font-size:0.85rem; font-weight:700; color:var(--green-800); margin-bottom:0.75rem; display:flex; align-items:center; gap:6px; }
+    .stat-row { display:flex; justify-content:space-between; align-items:center; padding:6px 0; border-bottom:1px solid var(--cream-100); font-size:0.82rem; }
+    .stat-row:last-child { border-bottom:none; }
+    .last-updated { font-size:0.72rem; color:var(--text-300); text-align:center; padding:10px; border-top:1px solid var(--cream-100); }
+  </style>
+</head>
+<body>
+  <div id="toastContainer" class="toast-container"></div>
+
+  <nav class="navbar">
+    <a href="dashboard.html" class="navbar-brand">
+      <div class="navbar-logo">🌾</div>
+      <div class="navbar-brand-text">
+        <span class="brand-main">KisanMitra</span>
+        <span class="brand-sub">Smart Farming</span>
+      </div>
+    </a>
+    <ul class="navbar-nav-links">
+      <li><a href="dashboard.html"><i class="fas fa-home"></i> <span data-i18n="nav.dashboard">Dashboard</span></a></li>
+      <li><a href="crops.html"><i class="fas fa-seedling"></i> <span data-i18n="nav.crops">Crop Advisor</span></a></li>
+      <li><a href="prices.html"><i class="fas fa-chart-bar"></i> <span data-i18n="nav.prices">Market Prices</span></a></li>
+      <li><a href="pest.html"><i class="fas fa-bug"></i> <span data-i18n="nav.pest">Pest Check</span></a></li>
+      <li><a href="schemes.html"><i class="fas fa-scroll"></i> <span data-i18n="nav.schemes">Schemes</span></a></li>
+    </ul>
+    <div class="navbar-actions">
+      <button class="lang-btn" id="langBtn" onclick="toggleLang()">हिंदी</button>
+      <button class="voice-btn" onclick="toggleVoice()" title="Voice Command"><i class="fas fa-microphone"></i></button>
+      <a href="profile.html" class="nav-avatar"><i class="fas fa-user-circle"></i></a>
+      <button onclick="logout()" class="btn-logout"><i class="fas fa-sign-out-alt"></i></button>
+    </div>
+  </nav>
+
+  <main class="page-content">
+    <div class="prices-hero">
+      <h1 style="color:#fff;font-size:1.8rem;margin-bottom:4px;"><i class="fas fa-chart-bar"></i> <span data-i18n="price.title">Market Prices (Mandi)</span></h1>
+      <p style="opacity:0.85;font-size:0.9rem;">Live Minimum Support Prices for 23 crops across India.</p>
+    </div>
+
+    <div class="prices-filters">
+      <div class="filter-group" style="flex:2;min-width:200px;">
+        <div class="filter-label">Search Crop</div>
+        <div class="search-wrap">
+          <i class="fas fa-search"></i>
+          <input type="text" id="priceSearch" class="form-control-custom" data-i18n-ph="price.search" placeholder="Search crop…" oninput="filterPrices()" style="width:100%;">
+          <button class="voice-search-btn" onclick="voiceFillInput('priceSearch')" title="Voice search"><i class="fas fa-microphone"></i></button>
+        </div>
+      </div>
+      <div class="filter-group">
+        <div class="filter-label">Category</div>
+        <select id="categoryFilter" class="form-select-custom" onchange="filterPrices()">
+          <option value="">All Categories</option>
+          <option>Cereals</option>
+          <option>Cash Crops</option>
+          <option>Oilseeds</option>
+          <option>Pulses</option>
+          <option>Vegetables</option>
+          <option>Spices</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <div class="filter-label">Trend</div>
+        <select id="trendFilter" class="form-select-custom" onchange="filterPrices()">
+          <option value="">All Trends</option>
+          <option value="up">Rising ▲</option>
+          <option value="down">Falling ▼</option>
+          <option value="stable">Stable —</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="prices-layout">
+      <div>
+        <div class="prices-table-wrap">
+          <table class="prices-table">
+            <thead>
+              <tr>
+                <th><span data-i18n="price.crop">Crop</span></th>
+                <th><span data-i18n="price.price">Price (₹)</span></th>
+                <th><span data-i18n="price.state">State</span></th>
+                <th>Category</th>
+                <th><span data-i18n="price.trend">Trend</span></th>
+              </tr>
+            </thead>
+            <tbody id="pricesTbody">
+              <tr><td colspan="5" style="text-align:center;padding:2rem;">
+                <i class="fas fa-spinner fa-spin" style="color:var(--green-500);font-size:1.5rem;"></i>
+              </td></tr>
+            </tbody>
+          </table>
+          <div class="last-updated">
+            <i class="fas fa-clock"></i> Data as of today · MSP rates from Government of India
+          </div>
+        </div>
+        <div id="pricesLoader"></div>
+      </div>
+
+      <div class="price-stats" id="priceStats"></div>
+    </div>
+  </main>
+
+  <script src="js/i18n.js"></script>
+  <script src="js/common.js"></script>
+  <script src="js/prices.js"></script>
+  <script src="js/voice.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => { requireAuth(); });
+  </script>
+</body>
+</html>

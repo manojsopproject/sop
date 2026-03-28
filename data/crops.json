@@ -1,0 +1,86 @@
+{
+  "Sandy": {
+    "Kharif": {
+      "crops": ["Groundnut", "Bajra", "Moong", "Cowpea", "Watermelon"],
+      "tip": "Sandy soils drain quickly — ensure regular irrigation and organic matter to retain moisture."
+    },
+    "Rabi": {
+      "crops": ["Barley", "Mustard", "Gram", "Linseed"],
+      "tip": "Winter rabi crops can tolerate sandy soils well with adequate phosphorus fertilization."
+    },
+    "Zaid": {
+      "crops": ["Cucumber", "Muskmelon", "Bitter Gourd", "Pumpkin"],
+      "tip": "Short-duration summer crops thrive in sandy soils with drip irrigation."
+    }
+  },
+  "Loamy": {
+    "Kharif": {
+      "crops": ["Rice", "Maize", "Cotton", "Soybean", "Sugarcane", "Arhar"],
+      "tip": "Loamy soil is ideal — focus on balanced NPK fertilization for best yields."
+    },
+    "Rabi": {
+      "crops": ["Wheat", "Mustard", "Potato", "Peas", "Lentil", "Sunflower"],
+      "tip": "Excellent for rabi season. Wheat and mustard intercropping can maximize returns."
+    },
+    "Zaid": {
+      "crops": ["Maize", "Moong", "Vegetable crops", "Watermelon", "Sunflower"],
+      "tip": "Loamy soil retains adequate moisture for summer crops with minimal irrigation."
+    }
+  },
+  "Clay": {
+    "Kharif": {
+      "crops": ["Rice", "Jute", "Sugarcane", "Taro"],
+      "tip": "Clay soils hold water well — perfect for paddy cultivation and water-intensive crops."
+    },
+    "Rabi": {
+      "crops": ["Wheat", "Chickpea", "Mustard", "Lentil"],
+      "tip": "Ensure proper drainage for rabi crops. Deep ploughing helps break clay hardpan."
+    },
+    "Zaid": {
+      "crops": ["Brinjal", "Okra", "Bitter Gourd"],
+      "tip": "Raised beds help manage clay soil drainage during summer season."
+    }
+  },
+  "Black": {
+    "Kharif": {
+      "crops": ["Cotton", "Soybean", "Jowar", "Groundnut", "Sunflower"],
+      "tip": "Black (Vertisol) soil is rich in minerals — well-suited for cotton and oilseeds."
+    },
+    "Rabi": {
+      "crops": ["Wheat", "Linseed", "Safflower", "Chickpea", "Rabi Sorghum"],
+      "tip": "Black soil retains moisture long after rains — reduce irrigation frequency."
+    },
+    "Zaid": {
+      "crops": ["Moong", "Urad", "Cowpea", "Sesame"],
+      "tip": "Summer legumes in black soil improve nitrogen fixation for the next season."
+    }
+  },
+  "Red": {
+    "Kharif": {
+      "crops": ["Ragi", "Groundnut", "Maize", "Horsegram", "Arhar"],
+      "tip": "Red soil is low in nitrogen and phosphorus — organic manure application is essential."
+    },
+    "Rabi": {
+      "crops": ["Wheat", "Gram", "Mustard", "Barley"],
+      "tip": "Add lime to reduce acidity of red soils. Good drainage makes it suitable for rabi crops."
+    },
+    "Zaid": {
+      "crops": ["Watermelon", "Cucumber", "Sesame", "Cowpea"],
+      "tip": "Mulching helps conserve moisture in red soils during hot summer months."
+    }
+  },
+  "Alluvial": {
+    "Kharif": {
+      "crops": ["Rice", "Maize", "Sugarcane", "Jute", "Cotton"],
+      "tip": "Highly fertile alluvial soil supports almost all crops — choose based on water availability."
+    },
+    "Rabi": {
+      "crops": ["Wheat", "Mustard", "Potato", "Peas", "Barley", "Sugarcane"],
+      "tip": "Alluvial soil of river plains gives best wheat yields in India — capitalize on this."
+    },
+    "Zaid": {
+      "crops": ["Vegetables", "Maize", "Moong", "Watermelon", "Sunflower"],
+      "tip": "Alluvial soils support year-round cultivation with proper crop rotation."
+    }
+  }
+}
